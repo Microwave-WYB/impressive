@@ -7,7 +7,7 @@ A Python DSL for functional programming patterns, exception handling, and contro
 ## Installation
 
 ```bash
-pip install impressive
+pip install git+https://github.com/Microwave-WYB/impressive.git
 ```
 
 ## Overview
