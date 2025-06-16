@@ -58,10 +58,10 @@ class apply(Generic[T]):
 
     func: Callable[[T], Any]
 
-    def __call__(self, factory: Callable[[], T]) -> T:
+    def __call__(self, factory: Callable[[], T]) -> Callable[[], T]:
         result = factory()
         self.func(result)
-        return result
+        return lambda: result
 
     @staticmethod
     def unpack_to(func: Callable[[Unpack[Ts]], Any]) -> "apply[tuple[Unpack[Ts]]]":
