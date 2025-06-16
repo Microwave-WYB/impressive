@@ -80,7 +80,7 @@ class apply(Generic[T]):
         """
         return apply(lambda args: func(*args))
 
-    def foreach(self, factory: Callable[[], Iterable[T]]) -> Iterable[T]:
+    def foreach(self, factory: Callable[[], Iterable[T]]) -> Callable[[], Iterable[T]]:
         """
         Create an apply instance that applies the function to each item in the iterable.
 
@@ -92,7 +92,7 @@ class apply(Generic[T]):
         results = factory()
         for r in results:
             self.func(r)
-        return results
+        return lambda: results
 
 
 CaseT = TypeVar("CaseT")
