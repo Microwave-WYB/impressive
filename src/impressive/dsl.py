@@ -9,12 +9,31 @@ from typing import (
     overload,
 )
 
-from typing_extensions import TypeVarTuple, Unpack
+from typing_extensions import TypeVarTuple, Unpack, deprecated
 
 Ts = TypeVarTuple("Ts")
 T = TypeVar("T", covariant=True)
 
 
+def let(*_: Any, ret: T = None) -> T:
+    """
+    Utility function to bind variables and perform side effects while returning a value.
+
+    Useful for writing multiple side effects in a single lambda.
+
+    >>> let(print("Hello"), print("World"), ret=42)
+    Hello
+    World
+    42
+    >>> add_and_print = lambda a, b: let(print(f"{a} + {b} = {a + b}"), ret=a + b)
+    >>> add_and_print(1, 2)
+    1 + 2 = 3
+    3
+    """
+    return ret
+
+
+@deprecated("Use `let` instead")
 def tap(*side_effects: Any, ret: T = None) -> T:
     """
     Utility function to perform side effects while returning a value.
