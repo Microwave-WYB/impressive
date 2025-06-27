@@ -214,6 +214,7 @@ class switch(Generic[T]):
 
 R = TypeVar("R", covariant=True)
 Es = TypeVarTuple("Es")
+E = TypeVar("E", bound=Exception, covariant=True)
 
 
 class catcher(Generic[T, Unpack[Es]]):
@@ -243,18 +244,37 @@ class catcher(Generic[T, Unpack[Es]]):
 
         return catcher(fn, *self.es)
 
+    @overload
     def recover(
-        self, exc: type[Exception], handler: Callable[[Exception], R]
-    ) -> "catcher[T | R, Unpack[Es]]":
+        self, handler: Callable[[Exception], R], /
+    ) -> "catcher[T | R, Unpack[Es]]": ...
+
+    @overload
+    def recover(
+        self, exc: type[E], handler: Callable[[E], R], /
+    ) -> "catcher[T | R, Unpack[Es]]": ...
+
+    def recover(
+        self,
+        *args,
+    ):
         """
         Recover from a specific exception type by applying a handler function.
+        >>> catcher(lambda: 1 / 0, ZeroDivisionError).recover(lambda e: -1).unwrap()
+        -1
         >>> catcher(lambda: 1 / 0, ZeroDivisionError).recover(ZeroDivisionError, lambda e: -1).unwrap()
         -1
         >>> catcher(lambda: 1 / 0, ZeroDivisionError).recover(ZeroDivisionError, lambda e: "Error").unwrap()
         'Error'
         """
 
-        def fn() -> T | R:
+        if len(args) == 1:
+            handler = args[0]
+            exc = Exception
+        else:
+            exc, handler = args
+
+        def fn():
             try:
                 return self.fn()
             except exc as e:
